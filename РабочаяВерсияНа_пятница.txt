@@ -224,19 +224,23 @@
 
         <section class="flex flex-col gap-4">
           <div class="card p-4">
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center justify-between mb-4">
               <div class="text-[15px] text-slate-400" id="chart1-title">Chart #1 · Indicator</div>
-              <button id="show-points-btn" class="text-xs px-3 py-1 rounded-full border border-slate-600 bg-slate-800 hover:bg-slate-700" title="Показать/скрыть значения на графике">
-                Показать
-              </button>
+              <div class="flex items-center gap-4">
+                <div id="chart1-legend" style="display:flex;gap:16px;font-size:12px;"></div>
+                <button id="show-points-btn" class="text-xs px-3 py-1 rounded-full border border-slate-600 bg-slate-800 hover:bg-slate-700" title="Показать/скрыть значения на графике">
+                  Показать
+                </button>
+              </div>
             </div>
             <div id="chart1" style="height:360px;width:100%;"></div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
             <div class="card p-4">
-              <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center justify-between mb-4">
                 <div class="text-[15px] text-slate-400" id="chart2-title">Chart #2 · Столбчатый по годам</div>
+                <div id="chart2-legend" style="display:flex;gap:16px;font-size:12px;"></div>
               </div>
               <div id="chart2" style="height:220px;width:100%;"></div>
             </div>
@@ -545,8 +549,38 @@
     renderChart1(chart1, rows1, monthsUsed, xLabels, selectedYears);
     renderChart2(chart2, rows2, monthsUsed, xLabels, selectedYears);
     renderChart3(rows3, selectedYears);
+    updateLegends(selectedYears);
 
     window._echartsInstances = APP.chartInstances;
+  }
+
+  function updateLegends(selectedYears) {
+    const chart1Legend = document.getElementById('chart1-legend');
+    const chart2Legend = document.getElementById('chart2-legend');
+    
+    chart1Legend.innerHTML = '';
+    chart2Legend.innerHTML = '';
+
+    selectedYears.forEach((year, idx) => {
+      const color = getYearColor(year, idx);
+      
+      const item1 = document.createElement('div');
+      item1.style.display = 'flex';
+      item1.style.alignItems = 'center';
+      item1.style.gap = '6px';
+      item1.style.color = '#D2D7D9';
+      item1.innerHTML = `<div style="width:10px;height:10px;background:${color};border-radius:2px;"></div>${year}`;
+      
+      const item2 = document.createElement('div');
+      item2.style.display = 'flex';
+      item2.style.alignItems = 'center';
+      item2.style.gap = '6px';
+      item2.style.color = '#D2D7D9';
+      item2.innerHTML = `<div style="width:10px;height:10px;background:${color};border-radius:2px;"></div>${year}`;
+      
+      chart1Legend.appendChild(item1);
+      chart2Legend.appendChild(item2);
+    });
   }
 
   function renderDifferenceTooltip(activeYears, firstValue, secondValue) {
@@ -666,11 +700,11 @@
       animationEasing: 'cubicOut',
       tooltip: {
         trigger: 'axis',
-        backgroundColor: 'rgba(15,23,42,.82)',
-        borderColor: 'rgba(255,255,255,.15)',
+        backgroundColor: 'rgba(20,22,29,0.4)',
+        borderColor: 'rgba(255,255,255,0.1)',
         borderWidth: 1,
         padding: 14,
-        extraCssText: 'backdrop-filter:blur(14px);border-radius:14px;box-shadow:0 10px 35px rgba(0,0,0,.35);',
+        extraCssText: 'backdrop-filter:blur(20px);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.15);',
         textStyle: { color: '#F8FAFC', fontSize: 12 },
         formatter: function (params) {
           if (!Array.isArray(params) || !params.length) return '';
@@ -698,11 +732,9 @@
         }
       },
       legend: {
-        top: 0,
-        type: 'scroll',
-        textStyle: { color: '#D2D7D9', fontSize: 10 }
+        show: false
       },
-      grid: { left: 36, right: 16, top: 36, bottom: 32 },
+      grid: { left: 36, right: 16, top: 12, bottom: 32 },
       xAxis: { type: 'category', data: xLabels, axisLine: { lineStyle: { color: '#454E52' } } },
       yAxis: { type: 'value', axisLine: { lineStyle: { color: '#454E52' } }, splitLine: { lineStyle: { color: 'rgba(103,117,123,0.4)' } } },
       series
@@ -758,11 +790,11 @@
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
-        backgroundColor: 'rgba(15,23,42,.82)',
-        borderColor: 'rgba(255,255,255,.15)',
+        backgroundColor: 'rgba(20,22,29,0.4)',
+        borderColor: 'rgba(255,255,255,0.1)',
         borderWidth: 1,
         padding: 14,
-        extraCssText: 'backdrop-filter:blur(14px);border-radius:14px;box-shadow:0 10px 35px rgba(0,0,0,.35);',
+        extraCssText: 'backdrop-filter:blur(20px);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.15);',
         textStyle: { color: '#F8FAFC', fontSize: 12 },
         formatter: function (params) {
           if (!Array.isArray(params) || !params.length) return '';
@@ -789,11 +821,9 @@
         }
       },
       legend: {
-        top: 0,
-        type: 'scroll',
-        textStyle: { color: '#D2D7D9', fontSize: 10 }
+        show: false
       },
-      grid: { left: 36, right: 16, top: 36, bottom: 32 },
+      grid: { left: 36, right: 16, top: 12, bottom: 32 },
       xAxis: { type: 'category', data: xLabels, axisLine: { lineStyle: { color: '#454E52' } } },
       yAxis: { type: 'value', axisLine: { lineStyle: { color: '#454E52' } }, splitLine: { lineStyle: { color: 'rgba(103,117,123,0.4)' } } },
       series
