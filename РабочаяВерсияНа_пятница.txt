@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title># Департамент Сервиса Dashboard · Отчёт по департаментам. 1-е полугодие</title>
 
-
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -27,9 +26,7 @@
     };
   </script>
 
-
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-
 
   <style>
     :root {
@@ -45,14 +42,12 @@
       --border: #2B313E;
     }
 
-
     body {
       background: var(--bg);
       font-family: 'Plus Jakarta Sans', sans-serif;
       color: var(--text);
       overflow-x: hidden;
     }
-
 
     .card {
       background: var(--card-bg);
@@ -95,13 +90,11 @@
       padding: 8px;
     }
 
-
     #app {
       background: var(--panel-bg);
       border: 1px solid var(--border);
       border-radius: 20px;
     }
-
 
     .text-slate-200, .text-white { color: var(--text) !important; }
     .text-slate-400, .text-grayText, .text-slate-300 { color: var(--text-muted) !important; }
@@ -111,7 +104,6 @@
     .border-slate-600, .border-slate-700 { border-color: var(--border) !important; }
     .bg-slate-800 { background: #1A1D24 !important; }
     .bg-slate-700:hover { background: #232933 !important; }
-
 
     body.light-mode {
       background: #F3F4F6;
@@ -144,7 +136,6 @@
     </button>
   </div>
 
-
   <div id="app" class="w-full mx-auto min-h-[80vh] flex flex-col gap-4 p-4 sm:p-5 transition-all duration-300" style="max-width:min(850px,calc(100vw-32px));">
     <header class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 mb-2">
       <div class="text-left">
@@ -156,50 +147,45 @@
       <div></div>
     </header>
 
-
     <div class="flex flex-col xl:flex-row gap-5 max-w-full">
       <aside class="w-full xl:w-24 min-w-0 flex flex-col items-center">
         <div class="card w-full px-2 py-3 mb-3 text-center flex items-center justify-center">
           <div class="text-[10px] uppercase tracking-wide text-slate-300">Отделы</div>
         </div>
 
-
         <nav class="flex flex-col gap-3 items-center sidebar-scroll">
-          <button class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white rounded-full" data-dept="Delivery" title="Доставка">
+          <button class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white rounded-full transition-all" data-dept="Delivery" title="Доставка">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M3 7h13l4 4v7a1 1 0 01-1 1h-1M3 7v11h2m4 0h6m-6 0a2 2 0 11-4 0m10 0a2 2 0 104 0"/>
             </svg>
           </button>
-          <button class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white rounded-full" data-dept="Installation" title="Установка">
+          <button class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white rounded-full transition-all" data-dept="Installation" title="Установка">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M11 3l1.5 4.5L17 9l-4.5 1.5L11 15l-1.5-4.5L5 9l4.5-1.5L11 3z"/>
             </svg>
           </button>
-          <button class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white rounded-full" data-dept="Customer" title="ОРК">
+          <button class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white rounded-full transition-all" data-dept="Customer" title="ОРК">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 3l7 4v5c0 4-2.8 7.4-7 9-4.2-1.6-7-5-7-9V7l7-4z"/>
             </svg>
           </button>
-          <button class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white rounded-full" data-dept="Call Center" title="Call центр">
+          <button class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white rounded-full transition-all" data-dept="Call Center" title="Call центр">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M5 4h3l2 5-2 1c1.2 2.5 3.5 4.8 6 6l1-2 5 2v3a2 2 0 01-2.2 2A16.9 16.9 0 014 7.2 2 2 0 015 4z"/>
             </svg>
           </button>
         </nav>
 
-
         <div class="w-full mt-4">
           <div class="card px-2 py-3 text-center">
             <div class="text-[11px] text-slate-300 mb-1">Годы</div>
             <div id="years-list" class="flex flex-col gap-1 items-stretch"></div>
-
 
             <div class="text-[11px] text-slate-300 mt-3 mb-1">Месяцы</div>
             <div id="months-grid" class="grid grid-cols-3 gap-1 text-[11px]"></div>
           </div>
         </div>
       </aside>
-
 
       <main class="flex-1 min-w-0 flex flex-col gap-4">
         <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 text-xs">
@@ -221,7 +207,6 @@
           </div>
         </section>
 
-
         <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 text-xs">
           <div class="card px-3 py-2.5">
             <div class="text-[15px] text-slate-400 mb-1">Сумма · Chart #1</div>
@@ -237,7 +222,6 @@
           </div>
         </section>
 
-
         <section class="flex flex-col gap-4">
           <div class="card p-4">
             <div class="flex items-center justify-between mb-2">
@@ -248,7 +232,6 @@
             </div>
             <div id="chart1" style="height:360px;width:100%;"></div>
           </div>
-
 
           <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
             <div class="card p-4">
@@ -291,7 +274,6 @@
     return map[key] || key;
   }
 
-
   function parseValue(v) {
     if (typeof v === 'string') {
       const s = v.replace(',', '.').replace('%', '').trim();
@@ -300,7 +282,6 @@
     }
     return Number(v) || 0;
   }
-
 
   const APP = {
     raw: [],
@@ -312,7 +293,6 @@
     chartInstances: []
   };
 
-
   const MONTH_ORDER = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
   const MONTH_LABELS = {
     '01': 'Янв', '02': 'Фев', '03': 'Мар', '04': 'Апр', '05': 'Май', '06': 'Июн',
@@ -321,11 +301,9 @@
   const YEAR_COLOR_MAP = { 2025: '#3B82F6', 2026: '#F59E0B' };
   const YEAR_COLORS = ['#00B0FF', '#FFD54F', '#00E676', '#FF5252', '#67757B'];
 
-
   function getYearColor(year, index) {
     return YEAR_COLOR_MAP[year] || YEAR_COLORS[index % YEAR_COLORS.length];
   }
-
 
   function getAveragePercentValue(rows) {
     if (!rows || !rows.length) return 0;
@@ -333,7 +311,6 @@
     if (!values.length) return 0;
     return (values.reduce((acc, value) => acc + value, 0) / values.length) * 100;
   }
-
 
   function parseDataToApp(dataArray) {
     APP.years = new Set();
@@ -346,10 +323,8 @@
       const indicator = r['Indicator'];
       const value = parseValue(r['Value']);
 
-
       if (year) APP.years.add(year);
       if (monthCode) APP.months.add(monthCode);
-
 
       return {
         dept: dep,
@@ -364,11 +339,9 @@
     });
   }
 
-
   function getAvailableYears() {
     return Array.from(APP.years).filter(Boolean).sort((a, b) => b - a);
   }
-
 
   function getActiveYears() {
     const availableYears = getAvailableYears();
@@ -381,20 +354,16 @@
     return [availableYears[0]];
   }
 
-
   function renderYearMonthControls() {
     const yearsArr = getAvailableYears();
     const monthsArr = Array.from(APP.months).filter(Boolean).sort((a, b) => MONTH_ORDER.indexOf(a) - MONTH_ORDER.indexOf(b));
-
 
     const yearsEl = document.getElementById('years-list');
     const monthsEl = document.getElementById('months-grid');
     if (!yearsEl || !monthsEl) return;
 
-
     yearsEl.innerHTML = '';
     monthsEl.innerHTML = '';
-
 
     yearsArr.forEach(year => {
       const btn = document.createElement('button');
@@ -404,7 +373,6 @@
       yearsEl.appendChild(btn);
     });
 
-
     monthsArr.forEach(month => {
       const btn = document.createElement('button');
       btn.className = 'month-pill px-2 py-1 rounded-full border border-slate-700 text-slate-200 hover:bg-slate-700 text-[11px]';
@@ -413,20 +381,16 @@
       monthsEl.appendChild(btn);
     });
 
-
     setupYearMonthSelection();
   }
-
 
   function setupYearMonthSelection() {
     const yearButtons = document.querySelectorAll('.year-pill');
     const monthButtons = document.querySelectorAll('.month-pill');
 
-
     const yearsArr = getAvailableYears();
     APP.selectedYears = yearsArr.length ? [yearsArr[0]] : [];
     APP.selectedMonths = new Set(APP.months);
-
 
     yearButtons.forEach(btn => {
       const year = Number(btn.dataset.year);
@@ -435,7 +399,6 @@
       btn.onclick = () => {
         const selectedYears = [...APP.selectedYears];
         const yearIndex = selectedYears.indexOf(year);
-
 
         if (yearIndex >= 0) {
           if (selectedYears.length > 1) {
@@ -448,13 +411,11 @@
           selectedYears.push(year);
         }
 
-
         APP.selectedYears = selectedYears;
         updateYearButtonStates();
         applyFiltersAndRender();
       };
     });
-
 
     monthButtons.forEach(btn => {
       const month = btn.dataset.month;
@@ -468,18 +429,15 @@
           selectedMonths.add(month);
         }
 
-
         APP.selectedMonths = selectedMonths;
         updateMonthButtonStates();
         applyFiltersAndRender();
       };
     });
 
-
     updateYearButtonStates();
     updateMonthButtonStates();
   }
-
 
   function updateYearButtonStates() {
     document.querySelectorAll('.year-pill').forEach(btn => {
@@ -488,7 +446,6 @@
     });
   }
 
-
   function updateMonthButtonStates() {
     document.querySelectorAll('.month-pill').forEach(btn => {
       const month = btn.dataset.month;
@@ -496,19 +453,15 @@
     });
   }
 
-
   function applyFiltersAndRender() {
     if (!APP.raw.length) return;
-
 
     const dept = APP.currentDept;
     const activeYears = getActiveYears();
     const years = new Set(activeYears);
     const months = APP.selectedMonths.size ? APP.selectedMonths : APP.months;
 
-
     const inSelection = r => years.has(r.year) && months.has(r.monthCode);
-
 
     const kpiRowsByDept = deptCode => APP.raw.filter(r => r.dept === deptCode && inSelection(r) && r.chart === 1);
     const kpiMap = {
@@ -517,7 +470,6 @@
       'Customer': { valId: 'kpi-customer-val', topId: 'kpi-customer-top', minId: 'kpi-customer-min' },
       'Call Center': { valId: 'kpi-call-center-val', topId: 'kpi-call-center-top', minId: 'kpi-call-center-min' }
     };
-
 
     Object.keys(kpiMap).forEach(code => {
       const rows = kpiRowsByDept(code);
@@ -530,7 +482,6 @@
       document.getElementById(kpiMap[code].minId).textContent = (min !== Infinity) ? min.toLocaleString('ru-RU') : '0';
     });
 
-
     const rowsForDept = APP.raw.filter(r => r.dept === dept && inSelection(r));
     const byChart = {
       1: rowsForDept.filter(r => r.chart === 1),
@@ -538,40 +489,33 @@
       3: rowsForDept.filter(r => r.chart === 3)
     };
 
-
     document.getElementById('total-chart1').textContent = byChart[1].reduce((acc, item) => acc + item.value, 0).toLocaleString('ru-RU');
     document.getElementById('total-chart2').textContent = byChart[2].reduce((acc, item) => acc + item.value, 0).toLocaleString('ru-RU');
     const chart3Average = getAveragePercentValue(byChart[3]).toFixed(1);
     document.getElementById('total-chart3').textContent = chart3Average + '%';
 
-
     updateChartTitles(byChart);
     renderCharts(byChart);
   }
-
 
   function updateChartTitles(byChart) {
     const chart1Row = byChart[1] && byChart[1][0];
     const chart1Title = chart1Row ? chart1Row.indicator : 'Chart #1';
     document.getElementById('chart1-title').textContent = `Chart #1 · ${chart1Title || 'Indicator'}`;
 
-
     const chart2Row = byChart[2] && byChart[2][0];
     const chart2Title = chart2Row ? chart2Row.indicator : 'Chart #2';
     document.getElementById('chart2-title').textContent = `Chart #2 · ${chart2Title || 'Столбчатый по годам'}`;
-
 
     const chart3Row = byChart[3] && byChart[3][0];
     const chart3Title = chart3Row ? chart3Row.indicator : 'Chart #3';
     document.getElementById('chart3-title').textContent = `Chart #3 · ${chart3Title || 'Доли по годам'}`;
   }
 
-
   function getMonthsUsed(rows) {
     const monthCodes = [...new Set(rows.map(r => r.monthCode))].filter(Boolean);
     return monthCodes.sort((a, b) => MONTH_ORDER.indexOf(a) - MONTH_ORDER.indexOf(b));
   }
-
 
   function disposeChartInstances() {
     if (window._echartsInstances && window._echartsInstances.length) {
@@ -582,7 +526,6 @@
     window._echartsInstances = [];
     APP.chartInstances = [];
   }
-
 
   function renderCharts(byChart) {
     disposeChartInstances();
@@ -606,7 +549,6 @@
     window._echartsInstances = APP.chartInstances;
   }
 
-
   function renderDifferenceTooltip(activeYears, firstValue, secondValue) {
     if (!activeYears || activeYears.length !== 2) return '';
 
@@ -616,9 +558,8 @@
 
     const diff = ((second - first) / first) * 100;
     const color = diff >= 0 ? '#22c55e' : '#f59e0b';
-    return '<div style="margin-top:4px;color:' + color + '">' + (diff >= 0 ? '+' : '') + diff.toFixed(1) + '% (' + activeYears[0] + ' → ' + activeYears[1] + ')</div>';
+    return '<div style="color:' + color + ';">' + (diff >= 0 ? '+' : '') + diff.toFixed(1) + '% (' + activeYears[0] + ' → ' + activeYears[1] + ')</div>';
   }
-
 
   function renderChart1(chart, rows, monthsUsed, xLabels, selectedYears) {
     const series = selectedYears.map((year, idx) => {
@@ -629,7 +570,6 @@
       });
 
       const numericValues = values.filter(value => typeof value === 'number' && isFinite(value));
-      const avg = numericValues.length ? numericValues.reduce((acc, value) => acc + value, 0) / numericValues.length : 0;
 
       return {
         name: String(year),
@@ -674,7 +614,13 @@
             }
           ])
         },
-        label: { show: SHOW_POINTS, position: 'top', color: '#F5F6FA', fontSize: 12, offset: [0, -15] },
+        label: {
+          show: SHOW_POINTS,
+          position: selectedYears.length === 2 ? (idx === 0 ? 'top' : 'bottom') : 'top',
+          color: '#F5F6FA',
+          fontSize: 12,
+          offset: selectedYears.length === 2 ? (idx === 0 ? [0, -15] : [0, 15]) : [0, -15]
+        },
         markPoint: {
           symbol: 'pin',
           symbolSize: 45,
@@ -734,20 +680,17 @@
 
           const seriesValues = params.filter(param => param.value !== null && param.value !== undefined && param.value !== '');
 
-          seriesValues.forEach(param => {
-            const value = Number(param.value);
-            html += '<div style="display:flex;justify-content:space-between;gap:10px;color:#F8FAFC;"><span>' + param.seriesName + '</span><strong>' + value.toLocaleString('ru-RU') + '</strong></div>';
-          });
-
-          const activeYears = getActiveYears().sort((a, b) => a - b);
-          if (activeYears.length === 2) {
-            const firstYear = String(activeYears[0]);
-            const secondYear = String(activeYears[1]);
-            const firstValue = seriesValues.find(param => String(param.seriesName) === firstYear);
-            const secondValue = seriesValues.find(param => String(param.seriesName) === secondYear);
-
-            if (firstValue && secondValue) {
-              html += renderDifferenceTooltip(activeYears, firstValue.value, secondValue.value) || '<div style="margin-top:4px;color:#FEDC41">—</div>';
+          if (seriesValues.length === 1) {
+            const value = Number(seriesValues[0].value);
+            html += '<div style="color:#F8FAFC;">' + seriesValues[0].seriesName + ' ' + value.toLocaleString('ru-RU') + '</div>';
+          } else if (seriesValues.length === 2) {
+            const val1 = Number(seriesValues[0].value);
+            const val2 = Number(seriesValues[1].value);
+            html += '<div style="color:#F8FAFC;">' + seriesValues[0].seriesName + ' ' + val1.toLocaleString('ru-RU') + '   ' + seriesValues[1].seriesName + ' ' + val2.toLocaleString('ru-RU') + '</div>';
+            
+            const activeYears = getActiveYears().sort((a, b) => a - b);
+            if (activeYears.length === 2) {
+              html += renderDifferenceTooltip(activeYears, val1, val2);
             }
           }
 
@@ -825,12 +768,23 @@
           if (!Array.isArray(params) || !params.length) return '';
           const xLabel = params[0].axisValueLabel || params[0].axisValue || '';
           let html = '<div style="font-weight:600;color:#F8FAFC">' + xLabel + '</div>';
-          params.forEach(param => {
-            const value = Number(param.value);
-            if (isFinite(value)) {
-              html += '<div style="display:flex;justify-content:space-between;gap:10px;color:#F8FAFC;"><span>' + param.seriesName + '</span><strong>' + value.toLocaleString('ru-RU') + '</strong></div>';
+
+          const seriesValues = params.filter(param => isFinite(Number(param.value)));
+
+          if (seriesValues.length === 1) {
+            const value = Number(seriesValues[0].value);
+            html += '<div style="color:#F8FAFC;">' + seriesValues[0].seriesName + ' ' + value.toLocaleString('ru-RU') + '</div>';
+          } else if (seriesValues.length === 2) {
+            const val1 = Number(seriesValues[0].value);
+            const val2 = Number(seriesValues[1].value);
+            html += '<div style="color:#F8FAFC;">' + seriesValues[0].seriesName + ' ' + val1.toLocaleString('ru-RU') + '   ' + seriesValues[1].seriesName + ' ' + val2.toLocaleString('ru-RU') + '</div>';
+            
+            const activeYears = getActiveYears().sort((a, b) => a - b);
+            if (activeYears.length === 2) {
+              html += renderDifferenceTooltip(activeYears, val1, val2);
             }
-          });
+          }
+
           return html;
         }
       },
