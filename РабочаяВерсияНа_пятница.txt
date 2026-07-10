@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title># Департамент Сервиса Dashboard · Отчёт по департаментам. 1-е полугодие</title>
+
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#01C48B',
+            accentYellow: '#FEDC41',
+            accentPink: '#FE375F',
+            accentPurple: '#50008E',
+            softBg: '#F5F6FA',
+            softBorder: '#D2D7D9',
+            grayText: '#67757B',
+            grayMuted: '#454E52'
+          }
+        }
+      }
+    };
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+
+
+  <style>
+    :root {
+      --bg: #14161D;
+      --panel-bg: #1E222B;
+      --card-bg: #252A34;
+      --text: #FFFFFF;
+      --text-muted: #7E8494;
+      --neon-green: #00E676;
+      --neon-red: #FF5252;
+      --neon-blue: #00B0FF;
+      --neon-gold: #FFD54F;
+      --border: #2B313E;
+    }
+
+
+    body {
+      background: var(--bg);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.28);
+      border: 1px solid var(--border);
+    }
+    .concave {
+      position: relative;
+      border-radius: 9999px;
+      background: linear-gradient(180deg, #111827, var(--panel-bg));
+      box-shadow: inset 0 6px 10px rgba(255,255,255,0.05);
+    }
+    .sidebar-scroll { max-height: calc(100vh - 260px); overflow-y: auto; }
+    
+    .pill-active {
+      background: linear-gradient(
+          180deg,
+          rgba(255,255,255,.09),
+          rgba(255,255,255,.04)
+      );
+      border: 1px solid rgba(255,255,255,.18) !important;
+      color: #FFFFFF !important;
+      box-shadow:
+          inset 0 1px 0 rgba(255,255,255,.10),
+          0 8px 18px rgba(0,0,0,.30);
+      backdrop-filter: blur(10px);
+      transform: translateY(-1px);
+      transition: .25s;
+    }
+
+    .chart3-tile {
+      min-width: 180px;
+      flex: 1 1 180px;
+      max-width: 100%;
+      height: 234px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card-bg);
+      padding: 8px;
+    }
+
+
+    #app {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+    }
+
+
+    .text-slate-200, .text-white { color: var(--text) !important; }
+    .text-slate-400, .text-grayText, .text-slate-300 { color: var(--text-muted) !important; }
+    .text-primary { color: var(--neon-green) !important; }
+    .text-accentYellow { color: var(--neon-gold) !important; }
+    .text-accentPink { color: var(--neon-red) !important; }
+    .border-slate-600, .border-slate-700 { border-color: var(--border) !important; }
+    .bg-slate-800 { background: #1A1D24 !important; }
+    .bg-slate-700:hover { background: #232933 !important; }
+
+
+    body.light-mode {
+      background: #F3F4F6;
+      color: #111827;
+    }
+    body.light-mode .card {
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid #e5e7eb;
+    }
+    body.light-mode .text-slate-200,
+    body.light-mode .text-slate-300,
+    body.light-mode .text-slate-400 {
+      color: #4b5563;
+    }
+    body.light-mode .chart3-tile {
+      background: rgba(255,255,255,0.9);
+      border-color: #e5e7eb;
+    }
+  </style>
+</head>
+<body class="text-slate-200 antialiased">
+<div class="min-h-screen flex flex-col items-center justify-start py-4">
+  <div class="w-full flex justify-between px-6 mb-2">
+    <button id="theme-toggle" class="text-xs px-3 py-1 rounded-full border border-slate-600 bg-slate-800 hover:bg-slate-700">
+      Темный / светлый
+    </button>
+    <button id="toggle-width" class="text-xs px-3 py-1 rounded-full border border-slate-600 bg-slate-800 hover:bg-slate-700">
+      Развернуть / свернуть
+    </button>
+  </div>
+
+
+  <div id="app" class="w-full mx-auto min-h-[80vh] flex flex-col gap-4 p-4 sm:p-5 transition-all duration-300" style="max-width:min(850px,calc(100vw-32px));">
+    <header class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 mb-2">
+      <div class="text-left">
+        <h1 class="text-2xl font-semibold text-white"># Департамент Сервиса Dashboard</h1>
+      </div>
+      <div class="text-center">
+        <p style="font-size: 15px;" class="text-slate-400">Отчёт по департаментам. 1-е полугодие</p>
+      </div>
+      <div></div>
+    </header>
+
+
+    <div class="flex flex-col xl:flex-row gap-5 max-w-full">
+      <aside class="w-full xl:w-24 min-w-0 flex flex-col items-center">
+        <div class="card w-full px-2 py-3 mb-3 text-center flex items-center justify-center">
+          <div class="text-[10px] uppercase tracking-wide text-slate-300">Отделы</div>
+        </div>
+
+
+        <nav class="flex flex-col gap-3 items-center sidebar-scroll">
+          <button class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white rounded-full" data-dept="Delivery" title="Доставка">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M3 7h13l4 4v7a1 1 0 01-1 1h-1M3 7v11h2m4 0h6m-6 0a2 2 0 11-4 0m10 0a2 2 0 104 0"/>
+            </svg>
+          </button>
+          <button class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white rounded-full" data-dept="Installation" title="Установка">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M11 3l1.5 4.5L17 9l-4.5 1.5L11 15l-1.5-4.5L5 9l4.5-1.5L11 3z"/>
+            </svg>
+          </button>
+          <button class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white rounded-full" data-dept="Customer" title="ОРК">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 3l7 4v5c0 4-2.8 7.4-7 9-4.2-1.6-7-5-7-9V7l7-4z"/>
+            </svg>
+          </button>
+          <button class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white rounded-full" data-dept="Call Center" title="Call центр">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M5 4h3l2 5-2 1c1.2 2.5 3.5 4.8 6 6l1-2 5 2v3a2 2 0 01-2.2 2A16.9 16.9 0 014 7.2 2 2 0 015 4z"/>
+            </svg>
+          </button>
+        </nav>
+
+
+        <div class="w-full mt-4">
+          <div class="card px-2 py-3 text-center">
+            <div class="text-[11px] text-slate-300 mb-1">Годы</div>
+            <div id="years-list" class="flex flex-col gap-1 items-stretch"></div>
+
+
+            <div class="text-[11px] text-slate-300 mt-3 mb-1">Месяцы</div>
+            <div id="months-grid" class="grid grid-cols-3 gap-1 text-[11px]"></div>
+          </div>
+        </div>
+      </aside>
+
+
+      <main class="flex-1 min-w-0 flex flex-col gap-4">
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 text-xs">
+          <div class="card px-3 py-2.5">
+            <div class="text-[15px] text-slate-400 leading-4">Доставка · выбранные периоды</div>
+            <div class="text-[15px] text-grayText leading-4">Значение: <span id="kpi-delivery-val" class="text-softBg">—</span> · Макс: <span id="kpi-delivery-top" class="text-accentYellow">—</span> · Мин: <span id="kpi-delivery-min" class="text-accentPink">—</span></div>
+          </div>
+          <div class="card px-3 py-2.5">
+            <div class="text-[15px] text-slate-400 leading-4">Установка · выбранные периоды</div>
+            <div class="text-[15px] text-grayText leading-4">Значение: <span id="kpi-installation-val" class="text-softBg">—</span> · Макс: <span id="kpi-installation-top" class="text-accentYellow">—</span> · Мин: <span id="kpi-installation-min" class="text-accentPink">—</span></div>
+          </div>
+          <div class="card px-3 py-2.5">
+            <div class="text-[15px] text-slate-400 leading-4">ОРК · выбранные периоды</div>
+            <div class="text-[15px] text-grayText leading-4">Значение: <span id="kpi-customer-val" class="text-softBg">—</span> · Макс: <span id="kpi-customer-top" class="text-accentYellow">—</span> · Мин: <span id="kpi-customer-min" class="text-accentPink">—</span></div>
+          </div>
+          <div class="card px-3 py-2.5">
+            <div class="text-[15px] text-slate-400 leading-4">Call центр · выбранные периоды</div>
+            <div class="text-[15px] text-grayText leading-4">Значение: <span id="kpi-call-center-val" class="text-softBg">—</span> · Макс: <span id="kpi-call-center-top" class="text-accentYellow">—</span> · Мин: <span id="kpi-call-center-min" class="text-accentPink">—</span></div>
+          </div>
+        </section>
+
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 text-xs">
+          <div class="card px-3 py-2.5">
+            <div class="text-[15px] text-slate-400 mb-1">Сумма · Chart #1</div>
+            <div class="text-lg font-semibold text-primary" id="total-chart1">—</div>
+          </div>
+          <div class="card px-3 py-2.5">
+            <div class="text-[15px] text-slate-400 mb-1">Сумма · Chart #2</div>
+            <div class="text-lg font-semibold text-accentYellow" id="total-chart2">—</div>
+          </div>
+          <div class="card px-3 py-2.5">
+            <div class="text-[15px] text-slate-400 mb-1">Средний % · Chart #3</div>
+            <div class="text-lg font-semibold text-accentPink" id="total-chart3">—</div>
+          </div>
+        </section>
+
+
+        <section class="flex flex-col gap-4">
+          <div class="card p-4">
+            <div class="flex items-center justify-between mb-2">
+              <div class="text-[15px] text-slate-400" id="chart1-title">Chart #1 · Indicator</div>
+              <button id="show-points-btn" class="text-xs px-3 py-1 rounded-full border border-slate-600 bg-slate-800 hover:bg-slate-700" title="Показать/скрыть значения на графике">
+                Показать
+              </button>
+            </div>
+            <div id="chart1" style="height:360px;width:100%;"></div>
+          </div>
+
+
+          <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
+            <div class="card p-4">
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-[15px] text-slate-400" id="chart2-title">Chart #2 · Столбчатый по годам</div>
+              </div>
+              <div id="chart2" style="height:220px;width:100%;"></div>
+            </div>
+            <div class="card p-4">
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-[15px] text-slate-400" id="chart3-title">Chart #3 · Доли по годам</div>
+              </div>
+              <div id="chart3" class="w-full h-full flex flex-wrap gap-3"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</div>
+
+<script>
+  let SHOW_POINTS = false;
+  
+  function normalizeDeptName(dep) {
+    const d = String(dep || '').toLowerCase().trim();
+    if (d === 'доставка') return 'Delivery';
+    if (d === 'установка') return 'Installation';
+    if (d === 'орк') return 'Customer';
+    if (d === 'call центр' || d === 'колл центр') return 'Call Center';
+    return dep;
+  }
+
+  function normalizeMonth(m) {
+    const map = {
+      'январь': '01', 'февраль': '02', 'март': '03', 'апрель': '04', 'май': '05', 'июнь': '06',
+      'июль': '07', 'август': '08', 'сентябрь': '09', 'октябрь': '10', 'ноябрь': '11', 'декабрь': '12'
+    };
+    const key = String(m || '').toLowerCase().trim();
+    return map[key] || key;
+  }
+
+
+  function parseValue(v) {
+    if (typeof v === 'string') {
+      const s = v.replace(',', '.').replace('%', '').trim();
+      const num = parseFloat(s);
+      return isNaN(num) ? 0 : num;
+    }
+    return Number(v) || 0;
+  }
+
+
+  const APP = {
+    raw: [],
+    currentDept: 'Delivery',
+    years: new Set(),
+    months: new Set(),
+    selectedYears: [],
+    selectedMonths: new Set(),
+    chartInstances: []
+  };
+
+
+  const MONTH_ORDER = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+  const MONTH_LABELS = {
+    '01': 'Янв', '02': 'Фев', '03': 'Мар', '04': 'Апр', '05': 'Май', '06': 'Июн',
+    '07': 'Июл', '08': 'Авг', '09': 'Сен', '10': 'Окт', '11': 'Ноя', '12': 'Дек'
+  };
+  const YEAR_COLOR_MAP = { 2025: '#3B82F6', 2026: '#F59E0B' };
+  const YEAR_COLORS = ['#00B0FF', '#FFD54F', '#00E676', '#FF5252', '#67757B'];
+
+
+  function getYearColor(year, index) {
+    return YEAR_COLOR_MAP[year] || YEAR_COLORS[index % YEAR_COLORS.length];
+  }
+
+
+  function getAveragePercentValue(rows) {
+    if (!rows || !rows.length) return 0;
+    const values = rows.map(item => Number(item.value) || 0).filter(value => Number.isFinite(value));
+    if (!values.length) return 0;
+    return (values.reduce((acc, value) => acc + value, 0) / values.length) * 100;
+  }
+
+
+  function parseDataToApp(dataArray) {
+    APP.years = new Set();
+    APP.months = new Set();
+    APP.raw = (dataArray || []).map(r => {
+      const dep = normalizeDeptName(r['Department']);
+      const year = Number(r['Year']);
+      const monthCode = normalizeMonth(r['Month']);
+      const chart = Number(r['Chart #'] || r['Chart'] || r['Chart#']);
+      const indicator = r['Indicator'];
+      const value = parseValue(r['Value']);
+
+
+      if (year) APP.years.add(year);
+      if (monthCode) APP.months.add(monthCode);
+
+
+      return {
+        dept: dep,
+        year,
+        monthLabel: r['Month'],
+        monthCode,
+        chart,
+        indicator,
+        value,
+        raw: r
+      };
+    });
+  }
+
+
+  function getAvailableYears() {
+    return Array.from(APP.years).filter(Boolean).sort((a, b) => b - a);
+  }
+
+
+  function getActiveYears() {
+    const availableYears = getAvailableYears();
+    if (!availableYears.length) return [];
+
+    if (APP.selectedYears && APP.selectedYears.length) {
+      return availableYears.filter(year => APP.selectedYears.includes(year));
+    }
+
+    return [availableYears[0]];
+  }
+
+
+  function renderYearMonthControls() {
+    const yearsArr = getAvailableYears();
+    const monthsArr = Array.from(APP.months).filter(Boolean).sort((a, b) => MONTH_ORDER.indexOf(a) - MONTH_ORDER.indexOf(b));
+
+
+    const yearsEl = document.getElementById('years-list');
+    const monthsEl = document.getElementById('months-grid');
+    if (!yearsEl || !monthsEl) return;
+
+
+    yearsEl.innerHTML = '';
+    monthsEl.innerHTML = '';
+
+
+    yearsArr.forEach(year => {
+      const btn = document.createElement('button');
+      btn.className = 'year-pill w-full px-2 py-1 rounded-full text-[11px] border border-slate-700 text-slate-200 hover:bg-slate-700';
+      btn.dataset.year = year;
+      btn.textContent = year;
+      yearsEl.appendChild(btn);
+    });
+
+
+    monthsArr.forEach(month => {
+      const btn = document.createElement('button');
+      btn.className = 'month-pill px-2 py-1 rounded-full border border-slate-700 text-slate-200 hover:bg-slate-700 text-[11px]';
+      btn.dataset.month = month;
+      btn.textContent = MONTH_LABELS[month] || month;
+      monthsEl.appendChild(btn);
+    });
+
+
+    setupYearMonthSelection();
+  }
+
+
+  function setupYearMonthSelection() {
+    const yearButtons = document.querySelectorAll('.year-pill');
+    const monthButtons = document.querySelectorAll('.month-pill');
+
+
+    const yearsArr = getAvailableYears();
+    APP.selectedYears = yearsArr.length ? [yearsArr[0]] : [];
+    APP.selectedMonths = new Set(APP.months);
+
+
+    yearButtons.forEach(btn => {
+      const year = Number(btn.dataset.year);
+      const isActive = APP.selectedYears.includes(year);
+      btn.classList.toggle('pill-active', isActive);
+      btn.onclick = () => {
+        const selectedYears = [...APP.selectedYears];
+        const yearIndex = selectedYears.indexOf(year);
+
+
+        if (yearIndex >= 0) {
+          if (selectedYears.length > 1) {
+            selectedYears.splice(yearIndex, 1);
+          }
+        } else if (selectedYears.length < 2) {
+          selectedYears.push(year);
+        } else {
+          selectedYears.splice(0, 1);
+          selectedYears.push(year);
+        }
+
+
+        APP.selectedYears = selectedYears;
+        updateYearButtonStates();
+        applyFiltersAndRender();
+      };
+    });
+
+
+    monthButtons.forEach(btn => {
+      const month = btn.dataset.month;
+      const isActive = APP.selectedMonths.has(month);
+      btn.classList.toggle('pill-active', isActive);
+      btn.onclick = () => {
+        const selectedMonths = new Set(APP.selectedMonths);
+        if (selectedMonths.has(month) && selectedMonths.size > 1) {
+          selectedMonths.delete(month);
+        } else if (!selectedMonths.has(month)) {
+          selectedMonths.add(month);
+        }
+
+
+        APP.selectedMonths = selectedMonths;
+        updateMonthButtonStates();
+        applyFiltersAndRender();
+      };
+    });
+
+
+    updateYearButtonStates();
+    updateMonthButtonStates();
+  }
+
+
+  function updateYearButtonStates() {
+    document.querySelectorAll('.year-pill').forEach(btn => {
+      const year = Number(btn.dataset.year);
+      btn.classList.toggle('pill-active', APP.selectedYears.includes(year));
+    });
+  }
+
+
+  function updateMonthButtonStates() {
+    document.querySelectorAll('.month-pill').forEach(btn => {
+      const month = btn.dataset.month;
+      btn.classList.toggle('pill-active', APP.selectedMonths.has(month));
+    });
+  }
+
+
+  function applyFiltersAndRender() {
+    if (!APP.raw.length) return;
+
+
+    const dept = APP.currentDept;
+    const activeYears = getActiveYears();
+    const years = new Set(activeYears);
+    const months = APP.selectedMonths.size ? APP.selectedMonths : APP.months;
+
+
+    const inSelection = r => years.has(r.year) && months.has(r.monthCode);
+
+
+    const kpiRowsByDept = deptCode => APP.raw.filter(r => r.dept === deptCode && inSelection(r) && r.chart === 1);
+    const kpiMap = {
+      'Delivery': { valId: 'kpi-delivery-val', topId: 'kpi-delivery-top', minId: 'kpi-delivery-min' },
+      'Installation': { valId: 'kpi-installation-val', topId: 'kpi-installation-top', minId: 'kpi-installation-min' },
+      'Customer': { valId: 'kpi-customer-val', topId: 'kpi-customer-top', minId: 'kpi-customer-min' },
+      'Call Center': { valId: 'kpi-call-center-val', topId: 'kpi-call-center-top', minId: 'kpi-call-center-min' }
+    };
+
+
+    Object.keys(kpiMap).forEach(code => {
+      const rows = kpiRowsByDept(code);
+      const sum = rows.reduce((acc, item) => acc + item.value, 0);
+      const max = rows.reduce((acc, item) => Math.max(acc, item.value), 0) || 0;
+      const min = rows.length > 0 ? rows.reduce((acc, item) => Math.min(acc, item.value), Infinity) : 0;
+     
+      document.getElementById(kpiMap[code].valId).textContent = sum ? sum.toLocaleString('ru-RU') : '0';
+      document.getElementById(kpiMap[code].topId).textContent = max ? max.toLocaleString('ru-RU') : '0';
+      document.getElementById(kpiMap[code].minId).textContent = (min !== Infinity) ? min.toLocaleString('ru-RU') : '0';
+    });
+
+
+    const rowsForDept = APP.raw.filter(r => r.dept === dept && inSelection(r));
+    const byChart = {
+      1: rowsForDept.filter(r => r.chart === 1),
+      2: rowsForDept.filter(r => r.chart === 2),
+      3: rowsForDept.filter(r => r.chart === 3)
+    };
+
+
+    document.getElementById('total-chart1').textContent = byChart[1].reduce((acc, item) => acc + item.value, 0).toLocaleString('ru-RU');
+    document.getElementById('total-chart2').textContent = byChart[2].reduce((acc, item) => acc + item.value, 0).toLocaleString('ru-RU');
+    const chart3Average = getAveragePercentValue(byChart[3]).toFixed(1);
+    document.getElementById('total-chart3').textContent = chart3Average + '%';
+
+
+    updateChartTitles(byChart);
+    renderCharts(byChart);
+  }
+
+
+  function updateChartTitles(byChart) {
+    const chart1Row = byChart[1] && byChart[1][0];
+    const chart1Title = chart1Row ? chart1Row.indicator : 'Chart #1';
+    document.getElementById('chart1-title').textContent = `Chart #1 · ${chart1Title || 'Indicator'}`;
+
+
+    const chart2Row = byChart[2] && byChart[2][0];
+    const chart2Title = chart2Row ? chart2Row.indicator : 'Chart #2';
+    document.getElementById('chart2-title').textContent = `Chart #2 · ${chart2Title || 'Столбчатый по годам'}`;
+
+
+    const chart3Row = byChart[3] && byChart[3][0];
+    const chart3Title = chart3Row ? chart3Row.indicator : 'Chart #3';
+    document.getElementById('chart3-title').textContent = `Chart #3 · ${chart3Title || 'Доли по годам'}`;
+  }
+
+
+  function getMonthsUsed(rows) {
+    const monthCodes = [...new Set(rows.map(r => r.monthCode))].filter(Boolean);
+    return monthCodes.sort((a, b) => MONTH_ORDER.indexOf(a) - MONTH_ORDER.indexOf(b));
+  }
+
+
+  function disposeChartInstances() {
+    if (window._echartsInstances && window._echartsInstances.length) {
+      window._echartsInstances.forEach(inst => {
+        if (inst && typeof inst.dispose === 'function') inst.dispose();
+      });
+    }
+    window._echartsInstances = [];
+    APP.chartInstances = [];
+  }
+
+
+  function renderCharts(byChart) {
+    disposeChartInstances();
+
+    const rows1 = byChart[1] || [];
+    const rows2 = byChart[2] || [];
+    const rows3 = byChart[3] || [];
+
+    const monthsUsed = getMonthsUsed([...rows1, ...rows2, ...rows3]);
+    const xLabels = monthsUsed.map(month => MONTH_LABELS[month] || month);
+
+    const selectedYears = getActiveYears().sort((a, b) => a - b);
+    const chart1 = echarts.init(document.getElementById('chart1'));
+    const chart2 = echarts.init(document.getElementById('chart2'));
+    APP.chartInstances = [chart1, chart2];
+
+    renderChart1(chart1, rows1, monthsUsed, xLabels, selectedYears);
+    renderChart2(chart2, rows2, monthsUsed, xLabels, selectedYears);
+    renderChart3(rows3, selectedYears);
+
+    window._echartsInstances = APP.chartInstances;
+  }
+
+
+  function renderDifferenceTooltip(activeYears, firstValue, secondValue) {
+    if (!activeYears || activeYears.length !== 2) return '';
+
+    const first = Number(firstValue);
+    const second = Number(secondValue);
+    if (!isFinite(first) || !isFinite(second) || first === 0) return '';
+
+    const diff = ((second - first) / first) * 100;
+    const color = diff >= 0 ? '#22c55e' : '#f59e0b';
+    return '<div style="margin-top:4px;color:' + color + '">' + (diff >= 0 ? '+' : '') + diff.toFixed(1) + '% (' + activeYears[0] + ' → ' + activeYears[1] + ')</div>';
+  }
+
+
+  function renderChart1(chart, rows, monthsUsed, xLabels, selectedYears) {
+    const series = selectedYears.map((year, idx) => {
+      const color = getYearColor(year, idx);
+      const values = monthsUsed.map(month => {
+        const total = rows.filter(r => r.year === year && r.monthCode === month).reduce((acc, item) => acc + item.value, 0);
+        return total === 0 ? null : total;
+      });
+
+      const numericValues = values.filter(value => typeof value === 'number' && isFinite(value));
+      const avg = numericValues.length ? numericValues.reduce((acc, value) => acc + value, 0) / numericValues.length : 0;
+
+      return {
+        name: String(year),
+        type: 'line',
+        smooth: true,
+        connectNulls: false,
+        symbol: 'circle',
+        symbolSize: 10,
+        showSymbol: SHOW_POINTS,
+        showAllSymbol: SHOW_POINTS,
+        emphasis: {
+          focus: 'series',
+          scale: true,
+          showSymbol: true,
+          itemStyle: {
+            shadowBlur: 30,
+            shadowColor: color,
+            borderColor: '#FFFFFF',
+            borderWidth: 2
+          },
+          lineStyle: {
+            width: 6
+          }
+        },
+        lineStyle: {
+          width: 4.5,
+          color: color,
+          shadowBlur: 18,
+          shadowColor: color,
+          shadowOffsetY: 0,
+          opacity: 0.95
+        },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            {
+              offset: 0,
+              color: echarts.color.lift(color, 0.15)
+            },
+            {
+              offset: 1,
+              color: 'rgba(255,255,255,0)'
+            }
+          ])
+        },
+        label: { show: SHOW_POINTS, position: 'top', color: '#F5F6FA', fontSize: 12, offset: [0, -15] },
+        markPoint: {
+          symbol: 'pin',
+          symbolSize: 45,
+          label: {
+            show: true,
+            formatter: '{c}',
+            color: '#fff',
+            fontSize: 11
+          },
+          data: [
+            {
+              type: 'max',
+              name: 'Максимум',
+              itemStyle: {
+                color: '#22c55e'
+              }
+            },
+            {
+              type: 'min',
+              name: 'Минимум',
+              itemStyle: {
+                color: '#ef4444'
+              }
+            }
+          ]
+        },
+        markLine: {
+          silent: true,
+          lineStyle: { type: 'dashed', color: color, width: 1.2 },
+          data: [{ type: 'average', name: 'Среднее' }],
+          label: { formatter: 'Среднее', color: color, fontSize: 10 }
+        },
+        data: values
+      };
+    });
+
+    chart.setOption({
+      color: YEAR_COLORS,
+      animation: true,
+      animationDuration: 900,
+      animationDurationUpdate: 700,
+      animationEasingUpdate: 'quarticOut',
+      animationEasing: 'cubicOut',
+      tooltip: {
+        trigger: 'axis',
+        backgroundColor: 'rgba(15,23,42,.82)',
+        borderColor: 'rgba(255,255,255,.15)',
+        borderWidth: 1,
+        padding: 14,
+        extraCssText: 'backdrop-filter:blur(14px);border-radius:14px;box-shadow:0 10px 35px rgba(0,0,0,.35);',
+        textStyle: { color: '#F8FAFC', fontSize: 12 },
+        formatter: function (params) {
+          if (!Array.isArray(params) || !params.length) return '';
+
+          const xLabel = params[0].axisValueLabel || params[0].axisValue || '';
+          let html = '<div style="font-weight:600;color:#F8FAFC">' + xLabel + '</div>';
+
+          const seriesValues = params.filter(param => param.value !== null && param.value !== undefined && param.value !== '');
+
+          seriesValues.forEach(param => {
+            const value = Number(param.value);
+            html += '<div style="display:flex;justify-content:space-between;gap:10px;color:#F8FAFC;"><span>' + param.seriesName + '</span><strong>' + value.toLocaleString('ru-RU') + '</strong></div>';
+          });
+
+          const activeYears = getActiveYears().sort((a, b) => a - b);
+          if (activeYears.length === 2) {
+            const firstYear = String(activeYears[0]);
+            const secondYear = String(activeYears[1]);
+            const firstValue = seriesValues.find(param => String(param.seriesName) === firstYear);
+            const secondValue = seriesValues.find(param => String(param.seriesName) === secondYear);
+
+            if (firstValue && secondValue) {
+              html += renderDifferenceTooltip(activeYears, firstValue.value, secondValue.value) || '<div style="margin-top:4px;color:#FEDC41">—</div>';
+            }
+          }
+
+          return html;
+        }
+      },
+      legend: {
+        top: 0,
+        type: 'scroll',
+        textStyle: { color: '#D2D7D9', fontSize: 10 }
+      },
+      grid: { left: 36, right: 16, top: 36, bottom: 32 },
+      xAxis: { type: 'category', data: xLabels, axisLine: { lineStyle: { color: '#454E52' } } },
+      yAxis: { type: 'value', axisLine: { lineStyle: { color: '#454E52' } }, splitLine: { lineStyle: { color: 'rgba(103,117,123,0.4)' } } },
+      series
+    });
+  }
+
+  function renderChart2(chart, rows, monthsUsed, xLabels, selectedYears) {
+    const series = selectedYears.map((year, idx) => ({
+      name: String(year),
+      type: 'bar',
+      barCategoryGap: '32%',
+      barWidth: '46%',
+      emphasis: {
+        focus: 'series',
+        scale: true,
+        itemStyle: {
+          shadowBlur: 18,
+          shadowColor: getYearColor(year, idx)
+        }
+      },
+      itemStyle: {
+        borderRadius: [8, 8, 0, 0],
+        shadowBlur: 10,
+        shadowOffsetY: 4,
+        shadowColor: 'rgba(0,0,0,.28)',
+        color: new echarts.graphic.LinearGradient(
+          0,
+          0,
+          0,
+          1,
+          [
+            {
+              offset: 0,
+              color: echarts.color.lift(getYearColor(year, idx), 0.22)
+            },
+            {
+              offset: 1,
+              color: getYearColor(year, idx)
+            }
+          ]
+        )
+      },
+      data: monthsUsed.map(month => {
+        return rows.filter(r => r.year === year && r.monthCode === month).reduce((acc, item) => acc + item.value, 0);
+      })
+    }));
+
+    chart.setOption({
+      color: YEAR_COLORS,
+      animation: true,
+      animationDuration: 900,
+      animationEasing: 'cubicOut',
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        backgroundColor: 'rgba(15,23,42,.82)',
+        borderColor: 'rgba(255,255,255,.15)',
+        borderWidth: 1,
+        padding: 14,
+        extraCssText: 'backdrop-filter:blur(14px);border-radius:14px;box-shadow:0 10px 35px rgba(0,0,0,.35);',
+        textStyle: { color: '#F8FAFC', fontSize: 12 },
+        formatter: function (params) {
+          if (!Array.isArray(params) || !params.length) return '';
+          const xLabel = params[0].axisValueLabel || params[0].axisValue || '';
+          let html = '<div style="font-weight:600;color:#F8FAFC">' + xLabel + '</div>';
+          params.forEach(param => {
+            const value = Number(param.value);
+            if (isFinite(value)) {
+              html += '<div style="display:flex;justify-content:space-between;gap:10px;color:#F8FAFC;"><span>' + param.seriesName + '</span><strong>' + value.toLocaleString('ru-RU') + '</strong></div>';
+            }
+          });
+          return html;
+        }
+      },
+      legend: {
+        top: 0,
+        type: 'scroll',
+        textStyle: { color: '#D2D7D9', fontSize: 10 }
+      },
+      grid: { left: 36, right: 16, top: 36, bottom: 32 },
+      xAxis: { type: 'category', data: xLabels, axisLine: { lineStyle: { color: '#454E52' } } },
+      yAxis: { type: 'value', axisLine: { lineStyle: { color: '#454E52' } }, splitLine: { lineStyle: { color: 'rgba(103,117,123,0.4)' } } },
+      series
+    });
+  }
+
+  function renderChart3(rows, selectedYears) {
+    const container = document.getElementById('chart3');
+    if (!container) return;
+    const years = selectedYears.length ? selectedYears : Array.from(APP.years).sort((a, b) => a - b);
+    container.innerHTML = '';
+    if (!rows.length || !years.length) {
+      container.innerHTML = '<div class="text-xs text-slate-400">Нет данных для Chart #3</div>';
+      return;
+    }
+
+    const renderPieChart = (title, chartId, averageValue) => {
+      const tile = document.createElement('div');
+      tile.className = 'chart3-tile';
+      tile.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span class="text-[11px] text-slate-300">${title}</span>
+          <span style="background:rgba(59,130,246,.20);color:#FFFFFF;border:1px solid rgba(59,130,246,.35);padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;">
+            Средний ${Number(averageValue || 0).toFixed(1)}%
+          </span>
+        </div>
+        <div style="display:flex;justify-content:center;align-items:center;height:205px;">
+          <div id="${chartId}" style="width:220px;height:220px;transform:translateY(-8px);"></div>
+        </div>
+      `;
+      container.appendChild(tile);
+      const pieDom = document.getElementById(chartId);
+      if (!pieDom) return null;
+      const oldPie = echarts.getInstanceByDom(pieDom);
+      if (oldPie) oldPie.dispose();
+      return echarts.init(pieDom);
+    };
+
+    const buildAverageData = (year, averageValue) => {
+      const percent = Math.max(0, Math.min(100, Number(averageValue) || 0));
+      return [
+        {
+          name: 'Средний %',
+          value: percent,
+          itemStyle: {
+            color: getYearColor(year)
+          }
+        },
+        {
+          name: 'Остальное',
+          value: 100 - percent,
+          itemStyle: {
+            color: '#1F2937'
+          }
+        }
+      ];
+    };
+
+    const getAveragePercent = year => {
+      const yearRows = rows.filter(r => r.year === year);
+      return getAveragePercentValue(yearRows);
+    };
+
+    if (years.length === 1) {
+      const year = years[0];
+      const yearColor = getYearColor(year, 0);
+      const pieChart = renderPieChart(String(year), 'pie-single', getAveragePercent(year));
+      if (!pieChart) return;
+      const data = buildAverageData(year, getAveragePercent(year));
+      pieChart.setOption({
+        color: [yearColor, '#334155'],
+        animation: true,
+        animationDuration: 800,
+        tooltip: {
+          trigger: 'item',
+          formatter: function (params) {
+            const averageValue = getAveragePercent(year);
+            const label = params.name || '';
+            const value = Number(params.value || 0);
+            return '<div style="font-weight:600">' + label + '</div><div>Значение: ' + value.toFixed(1) + '%</div><div>Средний % за период: ' + averageValue.toFixed(1) + '%</div>';
+          }
+        },
+        series: [{
+          name: String(year),
+          type: 'pie',
+          radius: ['48%', '78%'],
+          avoidLabelOverlap: false,
+          label: { show: false },
+          itemStyle: { borderRadius: 6, borderColor: '#020617', borderWidth: 2 },
+          data
+        }]
+      });
+      APP.chartInstances.push(pieChart);
+      return;
+    }
+
+    const outerYear = years[0];
+    const innerYear = years[1];
+    const outerColor = getYearColor(outerYear, 0);
+    const innerColor = getYearColor(innerYear, 1);
+    const pieChart = renderPieChart(outerYear + ' vs ' + innerYear, 'pie-combined', (getAveragePercent(outerYear) + getAveragePercent(innerYear)) / 2);
+    if (!pieChart) return;
+    const outerData = buildAverageData(outerYear, getAveragePercent(outerYear));
+    const innerData = buildAverageData(innerYear, getAveragePercent(innerYear));
+    pieChart.setOption({
+      animation: true,
+      animationDuration: 800,
+      tooltip: {
+        trigger: 'item',
+        formatter: function (params) {
+          const label = params.name || '';
+          const value = Number(params.value || 0);
+          const yearLabel = params.seriesName || '';
+          const yearRows = rows.filter(r => r.year === Number(yearLabel));
+          const averageValue = getAveragePercentValue(yearRows);
+          let html = '<div style="font-weight:600">' + label + ' (' + yearLabel + ')</div><div>Значение: ' + value.toFixed(1) + '%</div><div>Средний % за период: ' + averageValue.toFixed(1) + '%</div>';
+          return html;
+        }
+      },
+      series: [
+        {
+          name: String(outerYear),
+          type: 'pie',
+          radius: ['52%', '84%'],
+          avoidLabelOverlap: false,
+          label: { show: false },
+          itemStyle: { borderRadius: 6, borderColor: '#020617', borderWidth: 2 },
+          data: outerData
+        },
+        {
+          name: String(innerYear),
+          type: 'pie',
+          radius: ['28%', '48%'],
+          avoidLabelOverlap: false,
+          label: { show: false },
+          itemStyle: { borderRadius: 6, borderColor: '#020617', borderWidth: 2 },
+          data: innerData
+        }
+      ]
+    });
+    APP.chartInstances.push(pieChart);
+  }
+
+  function setupWidthToggle() {
+    const toggleBtn = document.getElementById('toggle-width');
+    if (!toggleBtn) return;
+    toggleBtn.addEventListener('click', () => {
+      try {
+        google.script.host.close();
+        google.script.run.showDashboardExpanded();
+      } catch (e) {
+        alert('Эта кнопка работает только из диалога Google Sheets.');
+      }
+    });
+  }
+
+  function setupThemeToggle() {
+    const body = document.body;
+    const toggleBtn = document.getElementById('theme-toggle');
+    if (!toggleBtn) return;
+    const saved = localStorage.getItem('dashboard-theme');
+    if (saved === 'light') body.classList.add('light-mode');
+    toggleBtn.addEventListener('click', () => {
+      body.classList.toggle('light-mode');
+      const theme = body.classList.contains('light-mode') ? 'light' : 'dark';
+      localStorage.setItem('dashboard-theme', theme);
+      if (window._echartsInstances) {
+        window._echartsInstances.forEach(inst => inst.resize());
+      }
+    });
+  }
+
+  function setupShowPointsButton() {
+    const btn = document.getElementById('show-points-btn');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      SHOW_POINTS = !SHOW_POINTS;
+      applyFiltersAndRender();
+    });
+  }
+
+  function resizeCharts() {
+    if (window._echartsInstances) {
+      window._echartsInstances.forEach(inst => inst.resize());
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    setupWidthToggle();
+    setupThemeToggle();
+    setupShowPointsButton();
+    window.addEventListener('resize', resizeCharts);
+    
+    document.querySelectorAll('nav button').forEach(btn => {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('concave', 'bg-slate-700', 'text-white'));
+        this.classList.add('concave', 'bg-slate-700', 'text-white');
+        APP.currentDept = this.getAttribute('data-dept');
+        applyFiltersAndRender();
+      });
+    });
+
+    try {
+      google.script.run
+        .withSuccessHandler(function (res) {
+          console.log("Ответ от getDepartmentData:", res);
+          if (res && res.ok && res.data) {
+            setTimeout(function () {
+              parseDataToApp(res.data);
+              console.log("APP.raw после парсинга:", APP.raw);
+              console.log("Найденные годы:", Array.from(APP.years));
+              console.log("Найденные месяцы:", Array.from(APP.months));
+              renderYearMonthControls();
+              const firstBtn = document.querySelector('nav button[data-dept="' + APP.currentDept + '"]');
+              if (firstBtn) firstBtn.classList.add('concave', 'bg-slate-700', 'text-white');
+              applyFiltersAndRender();
+            }, 400);
+          } else {
+            alert('Ошибка: ' + (res && res.error ? res.error : 'Неизвестная ошибка'));
+          }
+        })
+        .withFailureHandler(function (err) {
+          alert('Ошибка подключения: ' + err);
+          console.error(err);
+        })
+        .getDepartmentData();
+    } catch (e) {
+      alert('google.script.run недоступен. Открой дашборд как Web App или из меню Sheets.');
+      console.error(e);
+    }
+  });
+</script>
+</body>
+</html>
