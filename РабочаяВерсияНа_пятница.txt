@@ -294,7 +294,8 @@
     months: new Set(),
     selectedYears: [],
     selectedMonths: new Set(),
-    chartInstances: []
+    chartInstances: [],
+    maxMinData: {}
   };
 
   const MONTH_ORDER = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
@@ -546,6 +547,17 @@
     const chart2 = echarts.init(document.getElementById('chart2'));
     APP.chartInstances = [chart1, chart2];
 
+    // Вычисляем макс/мин значения для подсвечивания
+    APP.maxMinData = {};
+    selectedYears.forEach(year => {
+      const yearRows = rows1.filter(r => r.year === year);
+      if (yearRows.length) {
+        const maxVal = Math.max(...yearRows.map(r => r.value));
+        const minVal = Math.min(...yearRows.map(r => r.value));
+        APP.maxMinData[year] = { max: maxVal, min: minVal };
+      }
+    });
+
     renderChart1(chart1, rows1, monthsUsed, xLabels, selectedYears);
     renderChart2(chart2, rows2, monthsUsed, xLabels, selectedYears);
     renderChart3(rows3, selectedYears);
@@ -653,33 +665,29 @@
           position: selectedYears.length === 2 ? (idx === 0 ? 'top' : 'bottom') : 'top',
           color: '#F5F6FA',
           fontSize: 12,
-          offset: selectedYears.length === 2 ? (idx === 0 ? [0, -15] : [0, 15]) : [0, -15]
-        },
-        markPoint: {
-          symbol: 'pin',
-          symbolSize: 45,
-          label: {
-            show: true,
-            formatter: '{c}',
-            color: '#fff',
-            fontSize: 11
-          },
-          data: [
-            {
-              type: 'max',
-              name: 'Максимум',
-              itemStyle: {
-                color: '#22c55e'
-              }
-            },
-            {
-              type: 'min',
-              name: 'Минимум',
-              itemStyle: {
-                color: '#ef4444'
-              }
+          offset: selectedYears.length === 2 ? (idx === 0 ? [0, -15] : [0, 15]) : [0, -15],
+          formatter: function(params) {
+            const value = params.value;
+            const isMax = APP.maxMinData[year] && value === APP.maxMinData[year].max;
+            const isMin = APP.maxMinData[year] && value === APP.maxMinData[year].min;
+            
+            if (isMax) {
+              return '{max|' + value.toLocaleString('ru-RU') + '}';
+            } else if (isMin) {
+              return '{min|' + value.toLocaleString('ru-RU') + '}';
             }
-          ]
+            return value.toLocaleString('ru-RU');
+          }
+        },
+        rich: {
+          max: {
+            color: '#22c55e',
+            fontSize: 14
+          },
+          min: {
+            color: '#ef4444',
+            fontSize: 14
+          }
         },
         markLine: {
           silent: true,
@@ -700,11 +708,10 @@
       animationEasing: 'cubicOut',
       tooltip: {
         trigger: 'axis',
-        backgroundColor: 'rgba(20,22,29,0.4)',
-        borderColor: 'rgba(255,255,255,0.1)',
-        borderWidth: 1,
-        padding: 14,
-        extraCssText: 'backdrop-filter:blur(20px);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.15);',
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
+        borderWidth: 0,
+        padding: 0,
         textStyle: { color: '#F8FAFC', fontSize: 12 },
         formatter: function (params) {
           if (!Array.isArray(params) || !params.length) return '';
@@ -790,11 +797,10 @@
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
-        backgroundColor: 'rgba(20,22,29,0.4)',
-        borderColor: 'rgba(255,255,255,0.1)',
-        borderWidth: 1,
-        padding: 14,
-        extraCssText: 'backdrop-filter:blur(20px);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.15);',
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
+        borderWidth: 0,
+        padding: 0,
         textStyle: { color: '#F8FAFC', fontSize: 12 },
         formatter: function (params) {
           if (!Array.isArray(params) || !params.length) return '';
